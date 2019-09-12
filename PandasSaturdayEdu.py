@@ -7,6 +7,7 @@ Created on Thu Sep  5 10:21:53 2019
 
 import numpy as np
 import pandas as pd
+import datetime as dt 
 
 def quality_report(data):
     
@@ -44,12 +45,11 @@ quality_report(dataset_original)
 
 #Para la misiòn selecciòn de columnas Material, Date, Unis
 TareaEdu = dataset_original[['Material', 'Date', 'Units']]
-TareaEdu = TareaEdu[TareaEdu['Material'] != "Na"] #asegurar que elimina campos vacios
+TareaEdu = TareaEdu.dropna()
 TareaEdu = TareaEdu.rename(columns = {'Material':'CÓDIGO'})
 TareaEdu = TareaEdu[TareaEdu['Units'] >= 1]
 
 #Agrupando fecha
-import datetime as dt 
 TareaEdu['Date'] = pd.to_datetime(TareaEdu['Date']) 
 TareaEdu['Month'] = TareaEdu['Date'].dt.month 
 TareaEdu['AÑO'] = TareaEdu['Date'].dt.year 
@@ -58,15 +58,13 @@ TareaEdu['AÑO'] = TareaEdu['Date'].dt.year
 TareaEdu = TareaEdu.pivot_table(values = 'Units', index = ['CÓDIGO', 'AÑO'], columns = 'Month', fill_value=0, aggfunc = 'sum') 
 #Cambiando 1 : ENE.. 12:DIC
 TareaEdu = TareaEdu.rename(columns = {1:'ENE', 2:'FEB.', 3:'MAR.', 4:'ABR.',5:'MAY.',6:'JUN.',7:'JUL.',8:'AGO.',9:'SEP',10:'OCT.',11:'NOV.',12:'DIC.'} ) 
-prueba = TareaEdu.reset_index() 
-prueba = TareaEdu.sort_values(['AÑO','CÓDIGO'])
+TareaEdu = TareaEdu.sort_values(['AÑO','CÓDIGO'])
+TareaEdu = TareaEdu.reset_index() 
 
-#print(prueba)
-del(prueba) 
+
 print(TareaEdu)
 print(quality_report(TareaEdu)) 
-#TareaEdu.to_csv('TareaEdu.csv')
-
+TareaEdu.to_csv('TareaEdu.csv')
 
 
 
